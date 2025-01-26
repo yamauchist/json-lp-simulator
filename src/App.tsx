@@ -16,52 +16,9 @@ import { LifePlanSimulationResult } from "./models/LifePlanSimulationResult";
 import ExcelJS from "exceljs";
 import jsPDF from "jspdf";
 
-// 型定義
-// interface ChartData {
-//   categories: string[];
-//   series: { name: string; data: number[] }[];
-// }
-
 const App: React.FC = () => {
-  // 初期 JSON データ
-  const [jsonData, setJsonData] = useState<string>(
-    jsonString
-    // getSampleSetting()
-    // JSON.stringify(
-    //   {
-    //     categories: ["A", "B", "C", "D"],
-    //     series: [
-    //       { name: "シリーズ1", group: 'income', data: [10, 20, 30, 40] },
-    //       { name: "シリーズ2", group: 'income', data: [15, 25, 35, 45] },
-    //       { name: "シリーズ3", group: 'outcome', data: [10, 20, 30, 40] },
-    //       { name: "シリーズ4", group: 'outcome', data: [15, 25, 35, 45] },
-    //     ],
-    //   },
-    //   null,
-    //   2
-    // )
-  );
-  const debouncedJsonData = useDebounce(jsonData, 1000); // 1秒のディレイ
-
-  // JSON をパースしてグラフデータに変換
-  // let parsedData: ChartData = { categories: [], series: [] };
-  // try {
-  //   parsedData = JSON.parse(jsonData);
-  // } catch (error) {
-  //   console.error("Invalid JSON", error);
-  // }
-
-  // const options: ApexCharts.ApexOptions = {
-  //   chart: {
-  //     type: "bar",
-  //     stacked: true,
-  //   },
-  //   xaxis: {
-  //     categories: parsedData.categories || [],
-  //   },
-  // };
-
-  // const series = parsedData.series || [];
+  const [jsonData, setJsonData] = useState<string>(jsonString);
+  const debouncedJsonData = useDebounce(jsonData, 1000); 
 
   const [cashFlow, setCashFlow] = useState<ChartData>({
     options: undefined,
@@ -230,24 +187,6 @@ const App: React.FC = () => {
 
     console.log(result);
 
-    // テーブルデータの準備
-    // const headers = [["年度", "収入", "支出", "収支", "資産残高"]];
-    // const data = result.years.map((year) => [
-    //   year.toString(),
-    //   // result.incomes[index].toLocaleString(),
-    //   // result.outcomes[index].toLocaleString(),
-    //   // (result.incomes[index] - result.outcomes[index]).toLocaleString(),
-    //   // result.balances[index].toLocaleString(),
-    // ]);
-
-    // テーブルの描画
-    // pdf.autoTable({
-    //   head: headers,
-    //   body: data,
-    //   startY: 50,
-    //   margin: { top: 20 },
-    // });
-
     return pdf;
   };
 
@@ -267,7 +206,7 @@ const App: React.FC = () => {
   return (
     <div className="flex flex-col h-screen">
       <div className="bg-green-700 p-4 flex items-center">
-        <h1 className="text-2xl font-bold text-white">Life Plan Simulator</h1>
+        <h1 className="text-2xl font-bold text-white">JSON LP Simulator</h1>
         <button
           onClick={handleLoadClick}
           className="ml-4 text-white hover:underline hover:text-green-200"
