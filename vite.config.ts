@@ -8,7 +8,8 @@ const config = defineConfig({
   plugins: [react()],
   build : {
     outDir: './docs'
-  }
+  },
+  base: "/json-lp-simulator/",
 });
 
 // Vitest configuration
