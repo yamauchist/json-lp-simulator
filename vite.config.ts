@@ -6,6 +6,9 @@ import react from "@vitejs/plugin-react";
 // Vite configuration
 const config = defineConfig({
   plugins: [react()],
+  build : {
+    outDir: './docs'
+  }
 });
 
 // Vitest configuration
