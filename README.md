@@ -1,50 +1,81 @@
-# React + TypeScript + Vite
+# JSON ライフプランシミュレーター
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 概要
 
-Currently, two official plugins are available:
+JSON形式で設定したシミュレーション条件に基づいて、ライフプランシミュレーションを行うツールです。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+シミュレーション結果は支出入推移と資産推移の2種のグラフで確認できます。
 
-## Expanding the ESLint configuration
+入力内容は一切保存されませんので、安心してご利用ください。
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+銀行口座は複数設定できます。投資用の口座を設定し、年利を設定すると、投資による資産の増減をシミュレーションすることができます。
 
-- Configure the top-level `parserOptions` property like this:
+シミュレーションはシンプルな資金移動のみをシミュレーションします。下記については、自動での計算を行いません。付記事項を参考に金額を設定してください。
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+* 収入にかかる税金
+  
+  手取り額の推移を設定してください。
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+* 年金受給額
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+  厚生労働省の年金シミュレーターを利用してください。
+  https://www.mhlw.go.jp/stf/kouteki_nenkin_simulator.html
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+* 住宅ローン返済額
+
+  下記のような計算サービスを利用してください。
+  https://keisan.casio.jp/exec/system/1256183644
+
+* 子の養育費
+
+  国の統計などを参照して設定してください。 
+
+### JSONで設定するメリット
+
+シミュレーション条件をJSON形式で下記のメリットがあります。
+
+* シミュレーション条件が明確になる
+
+  シミュレーション条件が一つのファイル内で完結し、複数の画面にまたがって設定する必要がありません。
+
+* シミュレーション条件の保存が容易
+
+  保存するのはテキストファイルのみです。
+
+* シミュレーション内容の比較が容易
+  
+  各種テキスト比較ツールで比較が可能です。
+
+## 使い方
+
+### シミュレーション条件の設定
+
+画面左側のJSONエディターにて、シミュレーション条件を設定します。
+設定方法については、初期表示されるJSONファイルのコメントを参照してください。
+
+設定が完了すれば、更新ボタンをクリックすると、シミュレーションが実行され、画面右側のグラフが更新されます。
+
+ヘッダー部の設定保存をクリックすると、エディター内の設定をローカルに保存することができます。ページが更新されるとエディター内の設定が初期化されますので、ページを閉じる前には保存を実行してください。
+設定読込をクリックすると、ローカルに保存された設定を読み込むことができます。
+
+### シミュレーション結果の確認
+
+シミュレーション結果は、グラフによって確認することができます。
+
+画面右上のグラフでは支出入の推移が確認できます。
+各年における支出と収入が積み上げ棒グラフの形で表示されます。
+
+画面右下のグラフでは資産の推移が確認できます。
+各年における各口座の残高が積み上げ棒グラフの形で表示されます。
+
+棒グラフにマウスオーバーすると、詳細が確認できます。
+
+グラフ右上のハンバーガーボタンをクリックすると、グラフの画像をSVGもしくはPNG形式で保存することができます。
+
+### シミュレーション結果の保存
+
+ヘッダー部のCSV出力、Excel出力をクリックすると、シミュレーション結果がCSV形式もしくはExcel形式で保存できます。
+
+## 免責事項
+
+このシミュレータを使用したことによって生じたいかなる損害についても、当方は一切の責任を負いません。
