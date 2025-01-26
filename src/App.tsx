@@ -18,7 +18,7 @@ import jsPDF from "jspdf";
 
 const App: React.FC = () => {
   const [jsonData, setJsonData] = useState<string>(jsonString);
-  const debouncedJsonData = useDebounce(jsonData, 1000); 
+  const debouncedJsonData = useDebounce(jsonData, 1000);
 
   const [cashFlow, setCashFlow] = useState<ChartData>({
     options: undefined,
@@ -44,6 +44,18 @@ const App: React.FC = () => {
     setJsonData(val);
   }, []);
 
+  function getCurrentTimestamp() {
+    const now = new Date();
+
+    const year = now.getFullYear(); // 年
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // 月 (0始まりなので+1)
+    const date = String(now.getDate()).padStart(2, "0"); // 日
+    const hours = String(now.getHours()).padStart(2, "0"); // 時
+    const minutes = String(now.getMinutes()).padStart(2, "0"); // 分
+
+    return `${year}${month}${date}${hours}${minutes}`;
+  }
+
   // ファイル読み込み処理を追加
   const handleFileLoad = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -67,7 +79,7 @@ const App: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "lifeplan-settings.json";
+    a.download = `lifeplan-settings-${getCurrentTimestamp()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -100,7 +112,7 @@ const App: React.FC = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "lifeplan-result.csv";
+      link.download = `lifeplan-${getCurrentTimestamp()}.csv`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -163,7 +175,7 @@ const App: React.FC = () => {
 
       const link = document.createElement("a");
       link.href = url;
-      link.download = "lifeplan-result.xlsx";
+      link.download = `lifeplan-${getCurrentTimestamp()}.xlsx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -241,7 +253,8 @@ const App: React.FC = () => {
       <div className="flex h-full min-h-0">
         {/* 左側の JSON エディタ */}
         <div className="w-1/3 border-r border-gray-300 p-4 flex flex-col h-full">
-          <div className="h-full overflow-hidden">
+          <div className="h-full  flex flex-col">
+            <h3 className="text-lg font-semibold mb-2">シミュレーション設定</h3>
             <CodeMirror
               value={jsonData}
               extensions={[langs.javascript()]}
