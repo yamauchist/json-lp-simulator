@@ -38,11 +38,22 @@ const App: React.FC = () => {
     } catch (error) {
       console.error("Failed to parse JSON or calculate results:", error);
     }
-  }, [debouncedJsonData]);
+  }, []);
 
   const onChange = React.useCallback((val: string) => {
     setJsonData(val);
   }, []);
+
+  const handleUpdateClick = () => {
+    try {
+      const setting = LifePlanSetting.fromJSON(jsonData);
+      const result = setting.getResult();
+      setCashFlow(resultToCashFlowChartData(result));
+      setBalance(resultToBalanceChartData(result));
+    } catch (error) {
+      console.error("Failed to update charts:", error);
+    }
+  };
 
   function getCurrentTimestamp() {
     const now = new Date();
@@ -62,6 +73,7 @@ const App: React.FC = () => {
     if (file) {
       const text = await file.text();
       setJsonData(text);
+      handleUpdateClick();
     }
   };
 
@@ -249,12 +261,26 @@ const App: React.FC = () => {
         >
           PDF出力
         </button>
+        <a
+          target="_blank"
+          href="https://github.com/yamauchist/json-lp-simulator/blob/master/README.md"
+          className="ml-auto text-white hover:underline hover:text-green-200"
+        >
+          このツールについて
+        </a>
       </div>
       <div className="flex h-full min-h-0">
         {/* 左側の JSON エディタ */}
         <div className="w-1/3 border-r border-gray-300 p-4 flex flex-col h-full">
           <div className="h-full  flex flex-col">
-            <h3 className="text-lg font-semibold mb-2">シミュレーション設定</h3>
+            <div className="flex items-center mb-2">
+              <h3 className="text-lg font-semibold">シミュレーション設定</h3>
+              <button
+                onClick={handleUpdateClick}
+                className="ml-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-4 rounded-lg transition duration-200 ease-in-out">
+                結果更新
+              </button>
+            </div>
             <CodeMirror
               value={jsonData}
               extensions={[langs.javascript()]}
