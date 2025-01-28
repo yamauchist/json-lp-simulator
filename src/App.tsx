@@ -108,7 +108,7 @@ const App: React.FC = () => {
       ...rows.map((row) => row.join(",")),
     ].join("\n");
 
-    return csvContent;
+    return result.exportCsv();
   };
 
   // CSV出力ハンドラーを追加
