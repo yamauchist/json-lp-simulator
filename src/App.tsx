@@ -14,7 +14,6 @@ import { useDebounce } from "./utils/hooks";
 import jsonString from "./sampleData.jsonc?raw";
 import { LifePlanSimulationResult } from "./models/LifePlanSimulationResult";
 import ExcelJS from "exceljs";
-import jsPDF from "jspdf";
 
 const App: React.FC = () => {
   const [jsonData, setJsonData] = useState<string>(jsonString);
@@ -100,14 +99,6 @@ const App: React.FC = () => {
   };
 
   const generateCSV = (result: LifePlanSimulationResult) => {
-    const headers = ["年度", "収入", "支出", "収支", "資産残高"];
-    const rows = result.years.map((year: number) => [year]);
-
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.join(",")),
-    ].join("\n");
-
     return result.exportCsv();
   };
 
@@ -195,36 +186,6 @@ const App: React.FC = () => {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Failed to export Excel:", error);
-    }
-  };
-
-  // PDF生成関数を追加
-  const generatePDF = (result: LifePlanSimulationResult) => {
-    const pdf = new jsPDF();
-
-    // タイトル
-    pdf.setFontSize(20);
-    pdf.text("ライフプラン シミュレーション結果", 20, 20);
-
-    // サブタイトルと基本情報
-    pdf.setFontSize(12);
-    pdf.text("収支シミュレーション", 20, 40);
-
-    console.log(result);
-
-    return pdf;
-  };
-
-  // PDFダウンロードハンドラーを追加
-  const handlePDFExport = () => {
-    try {
-      const setting = LifePlanSetting.fromJSON(jsonData);
-      const result = setting.getResult();
-      const pdf = generatePDF(result);
-
-      pdf.save("lifeplan-report.pdf");
-    } catch (error) {
-      console.error("Failed to export PDF:", error);
     }
   };
 
