@@ -51,7 +51,8 @@ const App: React.FC = () => {
       setCashFlow(resultToCashFlowChartData(result));
       setBalance(resultToBalanceChartData(result));
     } catch (error) {
-      console.error("Failed to update charts:", error);
+      alert("JSONデータの解析に失敗しました。");
+      // console.error("Failed to update charts:", error);
     }
   };
 
