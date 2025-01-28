@@ -17,8 +17,11 @@ export function resultToCashFlowChartData(
       type: "bar",
       stacked: true,
       animations: {
-        enabled: false
-      }
+        enabled: false,
+      },
+    },
+    annotations: {
+      xaxis: [],
     },
     dataLabels: {
       enabled: false,
@@ -28,9 +31,11 @@ export function resultToCashFlowChartData(
     },
     xaxis: {
       categories: result.years || [],
-      tickAmount:10,
+      tickAmount: 10,
     },
   };
+
+  addAnnotaions(options, result);
 
   const incomeSeries = result.incomeResults.map((series: AmountPlanResult) => ({
     name: series.amountPlan.name,
@@ -57,8 +62,11 @@ export function resultToBalanceChartData(
       type: "bar",
       stacked: true,
       animations: {
-        enabled: false
-      }
+        enabled: false,
+      },
+    },
+    annotations: {
+      xaxis: [],
     },
     dataLabels: {
       enabled: false,
@@ -68,9 +76,11 @@ export function resultToBalanceChartData(
     },
     xaxis: {
       categories: result.years || [],
-      tickAmount:10,
+      tickAmount: 10,
     },
   };
+
+  addAnnotaions(options, result);
 
   const series = result.accountResults.map((series: AccountResult) => ({
     name: series.account.name,
@@ -78,4 +88,58 @@ export function resultToBalanceChartData(
   }));
 
   return { options: options, series: series };
+}
+
+function addAnnotaions(
+  options: ApexCharts.ApexOptions,
+  result: LifePlanSimulationResult
+) {
+  const ages = [0, 6, 12, 20, 60, 65];
+  const colors = ["#775DD0", "#008FFB", "#FF4560", "#FFBB28"];
+  let familyIndex = 0;
+  result.parentResults.forEach((parent) => {
+    const color = colors[familyIndex % 4];
+    parent.ages.forEach((age, index) => {
+      if (ages.includes(age))
+        options.annotations?.xaxis?.push({
+          x: result.years[index],
+          borderColor: color,
+          label: {
+            text: `${parent.parent.name} ${age}歳`,
+            borderColor: color,
+            offsetY: 20 * familyIndex,
+            orientation: "horizontal",
+            textAnchor: "start",
+            style: {
+              color: "#fff",
+              background: color,
+            },
+          },
+        });
+    });
+    familyIndex++;
+  });
+
+  result.childResults.forEach((child) => {
+    const color = colors[familyIndex % 4];
+    child.ages.forEach((age, index) => {
+      if (ages.includes(age))
+        options.annotations?.xaxis?.push({
+          x: result.years[index],
+          borderColor: color,
+          label: {
+            text: `${child.child.name} ${age}歳`,
+            borderColor: color,
+            offsetY: 20 * familyIndex,
+            style: {
+              color: "#fff",
+              background: color,
+            },
+            orientation: "horizontal",
+            textAnchor: "start",
+          },
+        });
+    });
+    familyIndex++;
+  });
 }
