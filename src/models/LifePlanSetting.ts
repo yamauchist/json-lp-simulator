@@ -22,24 +22,28 @@ export class Account {
       item.name,
       item.rate ?? 0.0,
       item.balance,
-      item.transferPlans?.map((item: any) => AmountPlan.fromJSON(item))
+      item.transferPlans?.map((item: any) => AmountPlan.fromJSON(item)),
+      item.closePlan ? CloseAccountPlan.fromJSON(item.closePlan) : undefined
     );
   }
   name: string;
   rate: number;
   balance: number;
   transferPlans: AmountPlan[] = [];
+  closePlan?: CloseAccountPlan;
 
   constructor(
     name: string,
     rate: number,
     balance: number,
-    transferPlans: AmountPlan[]
+    transferPlans: AmountPlan[],
+    closePlan?: CloseAccountPlan
   ) {
     this.name = name;
     this.rate = rate;
     this.balance = balance;
     this.transferPlans = transferPlans ?? [];
+    this.closePlan = closePlan;
   }
 
   get interest(): number {
@@ -158,16 +162,14 @@ export class Loan {
 
 export class CloseAccountPlan {
   static fromJSON(item: any) {
-    return new CloseAccountPlan(item.account, item.year, item.destination);
+    return new CloseAccountPlan(item.account, item.year);
   }
   account: string;
   year: number;
-  destination: string;
 
-  constructor(account: string, year: number, destination: string) {
+  constructor(account: string, year: number) {
     this.account = account;
     this.year = year;
-    this.destination = destination;
   }
 }
 
@@ -180,7 +182,6 @@ export class LifePlanSetting {
   outcomePlans: AmountPlan[] = [];
   accounts: Account[] = [];
   loan?: Loan;
-  closeAccountPlans: CloseAccountPlan[] = [];
 
   constructor(startYear: number, endYear: number) {
     this.startYear = startYear;
@@ -200,9 +201,6 @@ export class LifePlanSetting {
     );
     setting.accounts = data.accounts.map((item: any) => Account.fromJSON(item));
     setting.loan = data.loan ? Loan.fromJSON(data.loan) : undefined;
-    setting.closeAccountPlans = data.closeAccountPlans.map((item: any) =>
-      CloseAccountPlan.fromJSON(item)
-    );
     return setting;
   }
 
@@ -274,19 +272,21 @@ export class LifePlanSetting {
         account.balance += account.interest;
       });
 
-      setting.closeAccountPlans.forEach((plan) => {
-        if (plan.year === year) {
-          const src = accountDictionary[plan.account];
-          const dst = accountDictionary[plan.destination];
-          src.transferPlans.push(
-            new PulseAmountPlan(
-              `${src.name} → ${dst.name}`,
-              false,
-              plan.destination,
-              [{ year: year, amount: src.balance }]
-            )
-          );
+      setting.accounts.forEach((account) => {
+        if (account.closePlan) {
+          if (account.closePlan.year === year) {
+            const dst = accountDictionary[account.closePlan.account];
+            account.transferPlans.push(
+              new PulseAmountPlan(
+                `${account.name} → ${dst.name}`,
+                false,
+                dst.name,
+                [{ year: year, amount: account.balance }]
+              )
+            );
+          }
         }
+        account.balance += account.interest;
       });
 
       // 振替を実行

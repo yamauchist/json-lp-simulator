@@ -59,8 +59,8 @@ describe("LifePlanSetting", () => {
     const setting = LifePlanSetting.fromJSON(json);
 
     const result = setting.getResult();
-    expect(setting.startYear).toBe(2024);
-    expect(setting.endYear).toBe(2091);
+    expect(setting.startYear).toBe(2025);
+    expect(setting.endYear).toBe(2085);
   });
 
   it("口座の利息が正しく計算される", () => {

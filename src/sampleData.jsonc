@@ -84,7 +84,12 @@
       //IDECO口座を設定
       "name": "夫IDECO口座",
       "rate": 0.03,
-      "balance": 0
+      "balance": 0,
+      "closePlan": {
+        //退職後にIDECO口座を閉鎖して個人口座に振替
+        "account": "夫個人口座",
+        "year": 2056
+      }
     },
     {
       "name": "妻個人口座",
@@ -139,7 +144,12 @@
     {
       "name": "妻IDECO口座",
       "rate": 0.03,
-      "balance": 0
+      "balance": 0,
+      "closePlan": {
+        //退職後にIDECO口座を閉鎖して個人口座に振替
+        "account": "妻個人口座",
+        "year": 2056
+      }
     }
   ],
   //収入を設定
@@ -273,21 +283,6 @@
         //大学卒業後は0とする
         { "year": 2048, "amount": 0 }
       ]
-    }
-  ],
-  //口座の閉鎖を設定
-  "closeAccountPlans": [
-    {
-      //退職後にIDECO口座を閉鎖して個人口座に振替
-      "account": "夫IDECO口座",
-      "year": 2056,
-      "destination": "夫個人口座"
-    },
-    {
-      //退職後にIDECO口座を閉鎖して個人口座に振替
-      "account": "妻IDECO口座",
-      "year": 2056,
-      "destination": "妻個人口座"
     }
   ]
 }
