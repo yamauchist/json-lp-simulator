@@ -138,7 +138,7 @@ const App: React.FC = () => {
   const generateExcel = async (result: LifePlanSimulationResult) => {
     const workbook = new ExcelJS.Workbook();
     // Fetchを使ってテンプレートファイルを読み込む
-    const response = await fetch("/assets/template.xlsx");
+    const response = await fetch("assets/template.xlsx");
     const blob = await response.blob();
     const arrayBuffer = await blob.arrayBuffer();
     await workbook.xlsx.load(arrayBuffer);
@@ -255,12 +255,6 @@ const App: React.FC = () => {
           className="ml-4 text-white hover:underline hover:text-green-200"
         >
           Excel出力
-        </button>
-        <button
-          onClick={handlePDFExport}
-          className="ml-4 text-white hover:underline hover:text-green-200"
-        >
-          PDF出力
         </button>
         <a
           target="_blank"
