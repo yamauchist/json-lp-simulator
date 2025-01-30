@@ -53,12 +53,14 @@ export class LifePlanSimulationResult {
       const line =
         i === 0
           ? `年齢,${parent.parent.name},${parent.ages.join(",")}`
-          : `,${parent.parent.name},${parent.ages.join(",")}`;
+          : `,${parent.parent.name},${parent.ages
+              .map((age) => (age > 0 ? age.toString() : ""))
+              .join(",")}`;
       lines.push(line);
     });
 
     this.childResults.forEach((child) => {
-      const line = `,${child.child.name},${child.ages.join(",")}`;
+      const line = `,${child.child.name},${child.ages.map((age) => (age >= 0 ? age.toString() : "")).join(",")}`;
       lines.push(line);
     });
 
@@ -71,6 +73,16 @@ export class LifePlanSimulationResult {
           ? `収入,${income.amountPlan.name},${income.amounts.join(",")}`
           : `,${income.amountPlan.name},${income.amounts.join(",")}`;
       lines.push(line);
+    });
+
+    this.accountResults.forEach((accountResult, i) => {
+      if (accountResult.account.rate > 0) {
+        lines.push(
+          `,${accountResult.account.name}利息,${accountResult.interests.join(
+            ","
+          )}`
+        );
+      }
     });
 
     const outcomeResults = this.outcomeResults;
@@ -88,16 +100,18 @@ export class LifePlanSimulationResult {
           accountResult.account.name
         }残高,${accountResult.balances.join(",")}`
       );
-      lines.push(
-        `,${accountResult.account.name}利息,${accountResult.interests.join(
-          ","
-        )}`
-      );
+    });
+
+    let transferIndex = 0;
+    this.accountResults.forEach((accountResult) => {
       accountResult.transferResults.forEach((transferResult) => {
-        const line = `,${accountResult.account.name}から${
+        const line = `${transferIndex === 0 ? "振替," : ","}${
+          accountResult.account.name
+        }から${
           transferResult.transferPlan.account
         },${transferResult.amount.join(",")}`;
         lines.push(line);
+        transferIndex++;
       });
     });
 
