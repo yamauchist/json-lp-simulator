@@ -126,39 +126,206 @@ const App: React.FC = () => {
     }
   };
 
+  const getExcelFill = (argb: string) => {
+    return {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: argb },
+    } as ExcelJS.Fill;
+  };
+
+  const getFont = (bold: boolean) => {
+    return {
+      name: "Yu Gothic",
+      bold: bold,
+    } as ExcelJS.Font;
+  };
+
+  const setCell = (
+    cell: ExcelJS.Cell,
+    value: ExcelJS.CellValue | number,
+    argb: string,
+    bold: boolean = false,
+    numFmt: string = ""
+  ) => {
+    cell.value = value;
+    cell.font = getFont(bold);
+    cell.fill = getExcelFill(argb);
+    cell.numFmt = numFmt;
+  };
+
   const generateExcel = async (result: LifePlanSimulationResult) => {
     const workbook = new ExcelJS.Workbook();
-    // Fetchを使ってテンプレートファイルを読み込む
-    const response = await fetch("assets/template.xlsx");
-    const blob = await response.blob();
-    const arrayBuffer = await blob.arrayBuffer();
-    await workbook.xlsx.load(arrayBuffer);
-    const worksheet = workbook.getWorksheet("ライフプラン");
+    const worksheet = workbook.addWorksheet("ライフプラン");
 
     if (worksheet) {
-      // ヘッダー設定
-      worksheet.columns = [
-        { header: "年度", key: "year", width: 10 },
-        { header: "収入", key: "income", width: 15 },
-        { header: "支出", key: "outcome", width: 15 },
-        { header: "収支", key: "balance", width: 15 },
-        { header: "資産残高", key: "assets", width: 15 },
-      ];
+      let rowIndex = 1;
+      worksheet.getRow(rowIndex).getCell(1).value = "西暦";
+      worksheet.getRow(rowIndex).getCell(2).value = "";
+      setCell(worksheet.getRow(rowIndex).getCell(1), "西暦", "ff808080", true);
+      setCell(worksheet.getRow(rowIndex).getCell(2), "", "ff808080", true);
+      result.years.forEach((element, i) => {
+        worksheet.getRow(rowIndex).getCell(3 + i).value = element;
+      });
+      rowIndex++;
 
-      // データ追加
-      result.years.forEach((year) => {
-        worksheet.addRow({
-          year: year,
+      const ageRow = rowIndex;
+      worksheet.getRow(rowIndex).getCell(1).value = "年齢";
+      result.parentResults.forEach((element) => {
+        if (rowIndex != ageRow)
+          worksheet.getRow(rowIndex).getCell(1).value = "";
+        worksheet.getRow(rowIndex).getCell(2).value = element.parent.name;
+        element.ages.forEach((element, i) => {
+          worksheet.getRow(rowIndex).getCell(3 + i).value = element;
+        });
+        rowIndex++;
+      });
+
+      result.childResults.forEach((element) => {
+        if (rowIndex != ageRow)
+          worksheet.getRow(rowIndex).getCell(1).value = "";
+        worksheet.getRow(rowIndex).getCell(2).value = element.child.name;
+        element.ages.forEach((element, i) => {
+          worksheet.getRow(rowIndex).getCell(3 + i).value =
+            element >= 0 ? element : "";
+        });
+        rowIndex++;
+      });
+
+      const incomeRow = rowIndex;
+      worksheet.getRow(rowIndex).getCell(1).value = "収入";
+      result.incomeResults.forEach((income) => {
+        if (rowIndex != incomeRow)
+          worksheet.getRow(rowIndex).getCell(1).value = "";
+        worksheet.getRow(rowIndex).getCell(2).value = income.amountPlan.name;
+        income.amounts.forEach((element, i) => {
+          worksheet.getRow(rowIndex).getCell(3 + i).value = element;
+        });
+        rowIndex++;
+      });
+      result.accountResults.forEach((accountResult) => {
+        if (accountResult.account.rate > 0) {
+          worksheet.getRow(rowIndex).getCell(1).value = "";
+          worksheet
+            .getRow(rowIndex)
+            .getCell(2).value = `${accountResult.account.name}利息`;
+          accountResult.interests.forEach((element, i) => {
+            worksheet.getRow(rowIndex).getCell(3 + i).value = element;
+          });
+          rowIndex++;
+        }
+      });
+
+      const outcomeRow = rowIndex;
+      worksheet.getRow(rowIndex).getCell(1).value = "支出";
+      result.outcomeResults.forEach((outcome, i) => {
+        if (i != 0) worksheet.getRow(rowIndex).getCell(1).value = "";
+        worksheet.getRow(rowIndex).getCell(2).value = outcome.amountPlan.name;
+        outcome.amounts.forEach((element, i) => {
+          worksheet.getRow(rowIndex).getCell(3 + i).value = element;
+        });
+        rowIndex++;
+      });
+
+      const assetRow = rowIndex;
+      worksheet.getRow(rowIndex).getCell(1).value = "資産";
+      result.accountResults.forEach((accountResult, i) => {
+        if (i != 0) worksheet.getRow(rowIndex).getCell(1).value = "";
+        worksheet.getRow(rowIndex).getCell(2).value =
+          accountResult.account.name;
+        accountResult.balances.forEach((element, i) => {
+          worksheet.getRow(rowIndex).getCell(3 + i).value = element;
+        });
+        rowIndex++;
+      });
+
+      const transferRow = rowIndex;
+      worksheet.getRow(rowIndex).getCell(1).value = "振替";
+      result.accountResults.forEach((accountResult) => {
+        accountResult.transferResults.forEach((transferResult) => {
+          if (rowIndex != transferRow)
+            worksheet.getRow(rowIndex).getCell(1).value = "";
+          worksheet
+            .getRow(rowIndex)
+            .getCell(
+              2
+            ).value = `${accountResult.account.name}から${transferResult.transferPlan.account}`;
+          transferResult.amount.forEach((element, i) => {
+            worksheet.getRow(rowIndex).getCell(3 + i).value = element;
+          });
+          rowIndex++;
         });
       });
 
-      // スタイル設定
-      worksheet.getRow(1).font = { bold: true };
-      worksheet.getRow(1).fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FFE0E0E0" },
-      };
+      worksheet.eachRow((row, ri) => {
+        row.eachCell((cell, ci) => {
+          let fontName = "Yu Gothic";
+          let bold = false;
+          let fontColor = "ff000000";
+          let fill = "";
+          if (ci <= 2) {
+            bold = true;
+            fontColor = "ffffffff";
+            if (ri == 1) {
+              fill = "ff808080";
+            } else if (ri < incomeRow) {
+              fill = "ffe26b0a";
+            } else if (ri < outcomeRow) {
+              fill = "ff31869b";
+            } else if (ri < assetRow) {
+              fill = "ff963634";
+            } else if (ri < transferRow) {
+              fill = "ff76933c";
+            } else {
+              fill = "ff60497a";
+            }
+          } else {
+            if (ri >= incomeRow) {
+              cell.numFmt = "#,##0";
+            }
+            if (ri == 1) {
+              fill = "ffd9d9d9";
+            } else if (ri < incomeRow) {
+              fill = "fffde9d9";
+            } else if (ri < outcomeRow) {
+              fill = "ffdaeef3";
+            } else if (ri < assetRow) {
+              fill = "fff2dcdb";
+            } else if (ri < transferRow) {
+              fill = "ffebf1de";
+            } else {
+              fill = "ffe4dfec";
+            }
+          }
+          cell.font = {
+            name: fontName,
+            color: { argb: fontColor },
+            bold: bold,
+          };
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: fill },
+          };
+        });
+      });
+
+      worksheet.views = [{ state: "frozen", xSplit: 2, ySplit: incomeRow - 1 }];
+      worksheet.columns.forEach((column, colIndex) => {
+        if (colIndex == 1) {
+          let maxLength = 0;
+          worksheet.eachRow((row) => {
+            const cell = row.getCell(colIndex+1);
+            const columnLength = cell.value ? cell.value.toString().length : 1;
+            if (columnLength > maxLength) {
+              maxLength = columnLength;
+            }
+          });
+          column.width = maxLength*2 + 2; // 余白を加える
+        } else if (colIndex >= 2) {
+          column.width = 11;
+        }
+      });
     }
 
     return workbook;
@@ -233,7 +400,8 @@ const App: React.FC = () => {
               <h3 className="text-lg font-semibold">シミュレーション設定</h3>
               <button
                 onClick={handleUpdateClick}
-                className="ml-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-4 rounded-lg transition duration-200 ease-in-out">
+                className="ml-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-4 rounded-lg transition duration-200 ease-in-out"
+              >
                 結果更新
               </button>
             </div>
