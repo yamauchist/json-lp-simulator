@@ -75,7 +75,7 @@ export class LifePlanSimulationResult {
       lines.push(line);
     });
 
-    this.accountResults.forEach((accountResult, i) => {
+    this.accountResults.forEach((accountResult) => {
       if (accountResult.account.rate > 0) {
         lines.push(
           `,${accountResult.account.name}利息,${accountResult.interests.join(

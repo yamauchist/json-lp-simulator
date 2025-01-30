@@ -196,9 +196,15 @@ export class LifePlanSetting {
     setting.incomePlans = data.incomePlans.map((item: any) =>
       AmountPlan.fromJSON(item)
     );
+    setting.incomePlans.forEach((plan) => {
+      plan.isIncome = true;
+    });
     setting.outcomePlans = data.outcomePlans.map((item: any) =>
       AmountPlan.fromJSON(item)
     );
+    setting.outcomePlans.forEach((plan) => {
+      plan.isIncome = false;
+    });
     setting.accounts = data.accounts.map((item: any) => Account.fromJSON(item));
     setting.loan = data.loan ? Loan.fromJSON(data.loan) : undefined;
     return setting;
