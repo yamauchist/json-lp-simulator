@@ -27,12 +27,27 @@ export function resultToCashFlowChartData(
       enabled: false,
     },
     legend: {
-      show: false,
+      show: true,
+      position: "right",
     },
     xaxis: {
       categories: result.years || [],
       tickAmount: 10,
     },
+    tooltip: {
+      y: {
+        formatter: function (value) {
+          return value.toLocaleString(); // 数値にカンマを付けて金額フォーマット
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        formatter: function (value) {
+          return value.toLocaleString(); // 数値にカンマを付けて金額フォーマット
+        },
+      },
+    }
   };
 
   addAnnotaions(options, result);
@@ -72,12 +87,27 @@ export function resultToBalanceChartData(
       enabled: false,
     },
     legend: {
-      show: false,
+      show: true,
+      position: "right",
     },
     xaxis: {
       categories: result.years || [],
       tickAmount: 10,
     },
+    tooltip: {
+      y: {
+        formatter: function (value) {
+          return value.toLocaleString(); // 数値にカンマを付けて金額フォーマット
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        formatter: function (value) {
+          return value.toLocaleString(); // 数値にカンマを付けて金額フォーマット
+        },
+      },
+    }
   };
 
   addAnnotaions(options, result);
