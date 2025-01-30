@@ -4,13 +4,13 @@
   "endYear": 2085,
   //親の名前と開始年での年齢を設定
   "parents": [
-    { "name": "夫", "age": 30 },
-    { "name": "妻", "age": 30 }
+    { "name": "夫", "birthYear": 1995 },
+    { "name": "妻", "birthYear": 1995 }
   ],
   //子の名前と開始年での年齢を設定
   "children": [
-    { "name": "第一子", "age": 0 },
-    { "name": "第二子", "age": -2 }
+    { "name": "第一子", "birthYear": 2025 },
+    { "name": "第二子", "birthYear": 2027 }
   ],
   //銀行口座を設定
   "accounts": [

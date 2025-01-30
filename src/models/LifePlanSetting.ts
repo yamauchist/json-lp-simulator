@@ -65,18 +65,18 @@ export class Account {
 
 export class Parent {
   name: string;
-  age: number;
+  birthYear: number;
   incomePlan: AmountPlan | undefined;
   outcomePlan: AmountPlan | undefined;
 
   constructor(
     name: string,
-    age: number,
+    birthYear: number,
     incomePlan: AmountPlan | undefined,
     outcomePlan: AmountPlan | undefined
   ) {
     this.name = name;
-    this.age = age;
+    this.birthYear = birthYear;
     this.incomePlan = incomePlan;
     this.outcomePlan = outcomePlan;
   }
@@ -84,7 +84,7 @@ export class Parent {
   static fromJSON(data: any): Parent {
     return new Parent(
       data.name,
-      data.age,
+      data.birthYear,
       data.incomePlan ? AmountPlan.fromJSON(data.incomePlan) : undefined,
       data.outcomePlan ? AmountPlan.fromJSON(data.outcomePlan) : undefined
     );
@@ -95,17 +95,17 @@ export class Child {
   static fromJSON(item: any): Child {
     return new Child(
       item.name,
-      item.age,
+      item.birthYear,
       undefined //item.educationPlan
     );
   }
   name: string;
-  age: number;
+  birthYear: number;
   educationPlan?: EducationPlan;
 
-  constructor(name: string, age: number, educationPlan?: EducationPlan) {
+  constructor(name: string, birthYear: number, educationPlan?: EducationPlan) {
     this.name = name;
-    this.age = age;
+    this.birthYear = birthYear;
     this.educationPlan = educationPlan;
   }
 
@@ -219,7 +219,7 @@ export class LifePlanSetting {
     );
 
     result.parentResults = setting.parents.map((parent) => {
-      const ages = Array.from({ length }, (_, i) => parent.age + i);
+      const ages = result.years.map(year=>year-parent.birthYear);
       const incomeResult = parent.incomePlan?.getResult(result.years);
       const outcomeResult = parent.outcomePlan?.getResult(result.years);
       const parentResult = new ParentResult(
@@ -232,7 +232,7 @@ export class LifePlanSetting {
     });
 
     result.childResults = setting.children.map((child) => {
-      const ages = Array.from({ length }, (_, i) => child.age + i);
+      const ages = result.years.map(year=>year-child.birthYear);
       const educationPlan = child.createEducationCostPlan(setting.startYear);
       const educationCostResult = educationPlan?.getResult(result.years);
       const childResult = new ChildResult(child, ages, educationCostResult);
