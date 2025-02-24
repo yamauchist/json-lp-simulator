@@ -111,24 +111,6 @@ describe("AmountPlan", () => {
     });
   });
 
-  describe("doPlan", () => {
-    // it("should update account balance correctly", () => {
-    //   const plan = new StepAmountPlan(
-    //     "Test",
-    //     true,
-    //     "main",
-    //     [{ year: 2020, amount: 1000 }]
-    //   );
-
-    //   const accounts = {
-    //     main: { balance: 0 }
-    //   };
-
-    //   plan.doPlan(accounts, 2020);
-    //   expect(accounts.main.balance).toBe(1000);
-    // });
-  });
-
   describe("getResult", () => {
     it("should return correct amount plan result", () => {
       const plan = new StepAmountPlan(
